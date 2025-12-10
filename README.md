@@ -29,7 +29,7 @@ Das RUBM-System basiert auf vier getrennten, optimierten Modulen, die über ein 
 
 1.  **Klonen Sie das Repository:**
     ```bash
-    git clone [https://github.com/meltymon/restic-universal-manager.git](https://github.com/IhrUsername/restic-universal-manager.git)
+    git clone [https://github.com/meltymon/restic-universal-manager.git](https://github.com/meltymon/restic-universal-manager.git)
     cd restic-universal-manager
     ```
 2.  **Starten Sie den Manager:**
