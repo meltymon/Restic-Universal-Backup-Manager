@@ -1,6 +1,6 @@
 # restore.sh
 
-# Funktion für Option 5: Logs anzeigen (aus dem alten Skript übernommen)
+# Funktion für Option 5: Logs anzeigen
 view_logs() {
     clear
     echo "--- LOGS ANZEIGEN ---"
@@ -26,18 +26,19 @@ view_logs() {
             sudo journalctl -eu "$SYSTEMD_SERVICE" | less
         fi
     else
-        echo "Systemd nicht gefunden. Kann Journal nicht anzeigen."
+        echo "Systemd nicht gefunden."
     fi
+    read -p "Weiter mit Enter..."
 }
 
-# Funktion für Option 4: Restore
+# Funktion für Option 4: Restore Menü
 do_restore() {
     clear
     echo "--- RESTORE WIEDERHERSTELLUNG ---"
     if ! check_tools_and_env; then return; fi
     
     echo "1. Restore einer Einzeldatei/Verzeichnis (Im laufenden System)"
-    echo "2. Notfall-Systemwiederherstellung (Nur von Live-System ausführen)"
+    echo "2. Notfall-Systemwiederherstellung (NUR von Live-System ausführen!)"
     echo "3. Snapshots anzeigen"
     echo "4. Zurück"
     
@@ -61,11 +62,9 @@ do_restore() {
             fi
             ;;
         2)
-            # Logik für Systemwiederherstellung wird interaktiv im Skript ausgeführt
-            echo "WARNUNG: Dies muss von einem LIVE-LINUX-SYSTEM ausgeführt werden!"
-            read -p "Sind Sie sicher, dass Sie fortfahren möchten? (j/n): " confirm_emergency
+            echo "WARNUNG: Dies wird das gesamte System überschreiben. NUR von einem LIVE-LINUX-SYSTEM ausführen!"
+            read -p "Möchten Sie den interaktiven Notfall-Restore-Prozess starten? (j/n): " confirm_emergency
             if [[ "$confirm_emergency" =~ ^[jJ]$ ]]; then
-                # Ruft die eigentliche Restore-Logik auf
                 emergency_system_restore
             fi
             ;;
@@ -75,31 +74,50 @@ do_restore() {
     esac
 }
 
-# Diese Funktion führt den eigentlichen System-Restore durch
+# Funktion für Notfall-Restore
 emergency_system_restore() {
     clear
     echo "--- NOTFALL-SYSTEMWIEDERHERSTELLUNG (LIVE-SYSTEM) ---"
+    echo "Wird das Repository mit $REPO_URL verwenden."
     
-    # Interaktive Abfragen (da die Konfiguration in der Live-Umgebung oft nicht geladen wird)
+    # 1. Manuelle Abfrage der kritischen Partition
+    echo "---------------------------------------------------------"
+    lsblk
+    echo "---------------------------------------------------------"
     read -p "Partition zur Wiederherstellung (z.B. /dev/sda2): " TARGET_PARTITION
     
     RESTORE_MOUNT_POINT="/mnt/restic_restore"
     mkdir -p "$RESTORE_MOUNT_POINT"
     
+    # 2. Mounten
     echo "Partition $TARGET_PARTITION wird nach $RESTORE_MOUNT_POINT gemountet."
     sudo mount "$TARGET_PARTITION" "$RESTORE_MOUNT_POINT"
 
     if [ $? -ne 0 ]; then
         echo "FEHLER: Konnte Partition nicht mounten."
-        exit 1
+        return 1
     fi
     
-    # Restore des gesamten Systems
-    echo "Starte Voll-Restore..."
-    sudo restic restore latest --target "$RESTORE_MOUNT_POINT"
+    # 3. Snapshot-Wahl
+    restic snapshots
+    read -p "Snapshot-ID zur Wiederherstellung (latest oder ID): " SNAPSHOT_ID
+    SNAPSHOT_ID=${SNAPSHOT_ID:-latest}
+
+    # 4. Bestätigung und Restore
+    echo "WARNUNG: Alle Daten auf $TARGET_PARTITION werden überschrieben!"
+    read -p "Sind Sie SICHER, dass Sie $TARGET_PARTITION überschreiben möchten? (ja/nein): " CONFIRM_RESTORE
+
+    if [[ "$CONFIRM_RESTORE" != "ja" ]]; then
+        echo "Wiederherstellung abgebrochen."
+        sudo umount "$RESTORE_MOUNT_POINT"
+        return 0
+    fi
+    
+    echo "Starte Voll-Restore von $SNAPSHOT_ID nach $RESTORE_MOUNT_POINT..."
+    sudo restic restore "$SNAPSHOT_ID" --target "$RESTORE_MOUNT_POINT"
     
     if [ $? -eq 0 ]; then
-        echo "✅ RESTORE ERFOLGREICH. Bitte neu starten."
+        echo "✅ RESTORE ERFOLGREICH. WICHTIG: Boot-Konfiguration (GRUB/fstab) prüfen."
     else
         echo "❌ FEHLER BEI DER WIEDERHERSTELLUNG."
     fi
