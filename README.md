@@ -10,11 +10,11 @@ Entwickelt, um die Komplexität der Kommandozeile zu beseitigen, bietet RUBM ein
 
 | Feature | Beschreibung | Vorteil für den Nutzer |
 | :--- | :--- | :--- |
-| **Interaktives Setup** | Die gesamte Konfiguration (Repo-URL, Passwort, Ausschlüsse) wird beim ersten Start **interaktiv abgefragt** und in einer separaten Datei gespeichert – **keine manuelle Skriptbearbeitung nötig.** | Maximaler Komfort, minimales Fehlerpotenzial. |
+| **Interaktives Setup** | Die gesamte Konfiguration (Repo-URL, Passwort, Ausschlüsse) wird beim ersten Start **interaktiv abgefragt** und in einer separaten Datei gespeichert – **keine manuelle Skriptbearbeitung nötig.**  | Maximaler Komfort, minimales Fehlerpotenzial. |
 | **Universelle Portabilität** | Das Skript erkennt automatisch den verwendeten Paketmanager (`pacman`, `apt`, `dnf`) und überprüft, ob alle erforderlichen Tools (`restic`, `zip`, `rsync`) installiert sind. | Funktioniert **zuverlässig** auf fast jeder modernen Linux-Distribution (Arch, Debian, Ubuntu, Fedora etc.).  |
 | **Automatische Synchronisation** | Führt nach jedem Backup eine inkrementelle Synchronisation des Repositorys (via `rsync`) zu einem Remote-Ziel (z.B. Nextcloud/SFTP) durch und startet automatisch den `occ files:scan`. | **Einfache Offsite-Sicherung** ohne komplexe Cronjobs. |
 | **Modulare Struktur** | Aufgeteilt in logische Dateien (`config.sh`, `backup_logic.sh`, `restore.sh`), was das System extrem **übersichtlich und wartbar** macht.  | Ideal für Community-Beiträge und einfache Erweiterungen. |
-| **Management-Menü** | Ein intuitives Menü vereint Backup-Start, Integritätsprüfungen, Log-Analyse und Wiederherstellung an einem Ort. | Steuern Sie Ihr gesamtes Backup-System mit nur einem Befehl. |
+| **Management-Menü** | Ein intuitives Menü vereint Backup-Start, Integritätsprüfungen, Log-Analyse und Wiederherstellung an einem Ort.  | Steuern Sie Ihr gesamtes Backup-System mit nur einem Befehl. |
 
 ## 🚀 Die Vier Säulen der Sicherung
 
@@ -29,12 +29,12 @@ Das RUBM-System basiert auf vier getrennten, optimierten Modulen, die über ein 
 
 1.  **Klonen Sie das Repository:**
     ```bash
-    git clone [https://github.com/IhrUsername/restic-universal-manager.git](https://github.com/IhrUsername/restic-universal-manager.git)
+    git clone [https://github.com/meltymon/restic-universal-manager.git](https://github.com/IhrUsername/restic-universal-manager.git)
     cd restic-universal-manager
     ```
 2.  **Starten Sie den Manager:**
     ```bash
-    ./run.sh
+    bash ./run.sh
     ```
 3.  Wählen Sie **Option 1 (SETUP)** und folgen Sie den interaktiven Anweisungen, um Ihr Repository-Ziel (`REPO_URL`) und das Passwort einzugeben.
 
@@ -48,5 +48,3 @@ Das RUBM-System basiert auf vier getrennten, optimierten Modulen, die über ein 
 ## 🤝 Mitwirken (Contributing)
 
 Ihre Ideen sind willkommen! Da das Skript modular aufgebaut ist, sind Beiträge zu Erweiterungen (z.B. Unterstützung für neue Paketmanager, bessere Fehlerbehandlung) einfach zu implementieren.
-
----
