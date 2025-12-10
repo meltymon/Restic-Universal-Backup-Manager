@@ -14,7 +14,6 @@ load_user_config() {
 check_tools() {
     local missing_tools=()
     
-    # Prüft Restic (muss im PATH sein)
     if ! command -v restic &> /dev/null; then
         missing_tools+=("restic")
     fi
